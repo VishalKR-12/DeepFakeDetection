@@ -297,7 +297,7 @@ const analyzeDeepfakeFlow = ai.defineFlow(
       ...textAnalysis,
       heatmaps: {
         attention: attentionMedia.media.url,
-        anomaly: anomalyMedia.media.ul,
+        anomaly: anomalyMedia.media.url,
         temporal: temporalMedia.media.url,
         featureImportance: featureImportanceMedia.media.url,
       },
