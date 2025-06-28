@@ -93,36 +93,35 @@ const ConfidenceTimelineChart = ({ data }: { data: any[] }) => (
 );
 
 const jsonToXml = (json: object, rootElementName = "analysisReport") => {
-    let xml = '';
-
     const toXml = (value: any, name: string): string => {
-        let xmlString = '';
-        // Sanitize tag name
         const sanitizedName = name.replace(/[^a-zA-Z0-9_.-]/g, '_').replace(/^([0-9])/, '_$1');
+        
+        if (value === null || value === undefined) {
+            return `<${sanitizedName}/>`;
+        }
 
         if (Array.isArray(value)) {
+            let content = '';
             value.forEach(item => {
-                const singularName = sanitizedName.endsWith('s') ? sanitizedName.slice(0, -1) : 'item';
-                xmlString += toXml(item, singularName);
+                content += toXml(item, 'item'); 
             });
-        } else if (typeof value === 'object' && value !== null) {
-            xmlString += `<${sanitizedName}>`;
-            Object.keys(value).forEach(key => {
-                xmlString += toXml(value[key], key);
-            });
-            xmlString += `</${sanitizedName}>`;
-        } else {
-            const escapedValue = value !== null && value !== undefined 
-                ? value.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
-                : '';
-            xmlString += `<${sanitizedName}>${escapedValue}</${sanitizedName}>`;
+            return `<${sanitizedName}>${content}</${sanitizedName}>`;
         }
-        return xmlString;
+
+        if (typeof value === 'object') {
+            let content = '';
+            Object.keys(value).forEach(key => {
+                content += toXml(value[key], key);
+            });
+            return `<${sanitizedName}>${content}</${sanitizedName}>`;
+        }
+        
+        const escapedValue = value.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+        return `<${sanitizedName}>${escapedValue}</${sanitizedName}>`;
     };
 
-    xml += `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     xml += toXml(json, rootElementName);
-    
     return xml;
 };
 
@@ -185,7 +184,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           <TabsTrigger value="raw">Raw Data</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="summary" className="print:block">
+        <TabsContent value="summary" className="print:block" forceMount>
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="md:col-span-3">
               <CardHeader>
@@ -240,7 +239,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           </div>
         </TabsContent>
 
-        <TabsContent value="visuals" className="print:block">
+        <TabsContent value="visuals" className="print:block" forceMount>
           <Card>
             <CardHeader>
                 <CardTitle>Advanced Heatmap Analysis</CardTitle>
@@ -267,7 +266,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           </Card>
         </TabsContent>
 
-        <TabsContent value="timeline" className="print:block">
+        <TabsContent value="timeline" className="print:block" forceMount>
             <div className="grid gap-6">
                 <Card>
                     <CardHeader>
@@ -317,7 +316,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
             </div>
         </TabsContent>
 
-        <TabsContent value="xai" className="print:block">
+        <TabsContent value="xai" className="print:block" forceMount>
            <Card>
                <CardHeader><CardTitle>Explainable AI (XAI)</CardTitle><CardDescription>Understanding the AI's decision-making process.</CardDescription></CardHeader>
                <CardContent className="grid gap-6 md:grid-cols-2">
@@ -333,7 +332,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
            </Card>
         </TabsContent>
         
-        <TabsContent value="forensics" className="print:block">
+        <TabsContent value="forensics" className="print:block" forceMount>
             <Card>
                 <CardHeader><CardTitle>Forensic Report & Export</CardTitle></CardHeader>
                 <CardContent className="space-y-6">
@@ -356,7 +355,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
             </Card>
         </TabsContent>
 
-        <TabsContent value="raw" className="print:block">
+        <TabsContent value="raw" className="print:block" forceMount>
           <Card>
             <CardHeader><CardTitle>Raw JSON Data</CardTitle></CardHeader>
             <CardContent>
