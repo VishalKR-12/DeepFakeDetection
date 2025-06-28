@@ -167,7 +167,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
 
   return (
     <div className="w-full max-w-7xl flex flex-col items-center gap-8 animate-in fade-in duration-500">
-      <div className="text-center print:hidden">
+      <div className="text-center print-hidden">
         <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline">Analysis Complete</h2>
         <p className="mt-2 text-lg text-foreground/60">
           Review the comprehensive results from our multi-modal deepfake analysis.
@@ -175,7 +175,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
       </div>
 
       <Tabs defaultValue="summary" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 mb-4 print:hidden">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 mb-4 print-hidden">
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="visuals">Visual Evidence</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
@@ -184,7 +184,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           <TabsTrigger value="raw">Raw Data</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="summary" className="data-[state=inactive]:hidden print:block" forceMount>
+        <TabsContent value="summary" className="data-[state=inactive]:hidden print-block" forceMount>
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="md:col-span-3">
               <CardHeader>
@@ -239,7 +239,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           </div>
         </TabsContent>
 
-        <TabsContent value="visuals" className="data-[state=inactive]:hidden print:block" forceMount>
+        <TabsContent value="visuals" className="data-[state=inactive]:hidden print-block break-before" forceMount>
           <Card>
             <CardHeader>
                 <CardTitle>Advanced Heatmap Analysis</CardTitle>
@@ -266,7 +266,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           </Card>
         </TabsContent>
 
-        <TabsContent value="timeline" className="data-[state=inactive]:hidden print:block" forceMount>
+        <TabsContent value="timeline" className="data-[state=inactive]:hidden print-block break-before" forceMount>
             <div className="grid gap-6">
                 <Card>
                     <CardHeader>
@@ -316,7 +316,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
             </div>
         </TabsContent>
 
-        <TabsContent value="xai" className="data-[state=inactive]:hidden print:block" forceMount>
+        <TabsContent value="xai" className="data-[state=inactive]:hidden print-block break-before" forceMount>
            <Card>
                <CardHeader><CardTitle>Explainable AI (XAI)</CardTitle><CardDescription>Understanding the AI's decision-making process.</CardDescription></CardHeader>
                <CardContent className="grid gap-6 md:grid-cols-2">
@@ -332,7 +332,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
            </Card>
         </TabsContent>
         
-        <TabsContent value="forensics" className="data-[state=inactive]:hidden print:block" forceMount>
+        <TabsContent value="forensics" className="data-[state=inactive]:hidden print-block break-before" forceMount>
             <Card>
                 <CardHeader><CardTitle>Forensic Report & Export</CardTitle></CardHeader>
                 <CardContent className="space-y-6">
@@ -340,10 +340,10 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
                         <h3 className="font-semibold">Chain of Custody</h3>
                         <div className="flex items-center gap-2 mt-2 p-3 bg-muted rounded-md font-mono text-sm">
                             <span className="truncate">{result.forensics.chainOfCustody}</span>
-                            <Button variant="ghost" size="icon" className="w-8 h-8 print:hidden" onClick={() => handleCopy(result.forensics.chainOfCustody)}><Copy className="w-4 h-4" /></Button>
+                            <Button variant="ghost" size="icon" className="w-8 h-8 print-hidden" onClick={() => handleCopy(result.forensics.chainOfCustody)}><Copy className="w-4 h-4" /></Button>
                         </div>
                     </div>
-                    <div className="print:hidden">
+                    <div className="print-hidden">
                         <h3 className="font-semibold">Export Report</h3>
                         <div className="flex gap-4 mt-2">
                             <Button variant="outline" onClick={() => handleExport('JSON')}>Export as JSON</Button>
@@ -355,7 +355,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
             </Card>
         </TabsContent>
 
-        <TabsContent value="raw" className="data-[state=inactive]:hidden print:block" forceMount>
+        <TabsContent value="raw" className="data-[state=inactive]:hidden print-block break-before" forceMount>
           <Card>
             <CardHeader><CardTitle>Raw JSON Data</CardTitle></CardHeader>
             <CardContent>
@@ -368,7 +368,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
 
       </Tabs>
 
-      <div className="w-full mt-6 flex flex-col items-center gap-4 print:hidden">
+      <div className="w-full mt-6 flex flex-col items-center gap-4 print-hidden">
         <video src={videoPreview} controls className="w-full max-w-2xl rounded-lg aspect-video bg-black shadow-lg"></video>
         <Button onClick={onReset} size="lg" variant="outline" className="mt-4">
           Analyze Another Video
