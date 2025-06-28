@@ -108,7 +108,7 @@ const AnalyzeDeepfakeOutputSchema = z.object({
           })
         )
         .describe(
-          'Frame-by-frame confidence levels for a timeline graph. Generate exactly 30 data points representing video duration.'
+          'Frame-by-frame confidence levels for a timeline graph. Generate about 20-30 data points representing video duration.'
         ),
       suspiciousSegments: z
         .array(
@@ -204,7 +204,7 @@ const analyzeDeepfakePrompt = ai.definePrompt({
   4.  **Advanced Recognition**: Identify the likely 'creationMethod' and assess the 'sophistication' level.
   5.  **Heatmaps**: Provide placeholder image URLs from 'https://placehold.co/' for all four heatmap types. DO NOT add text to the URL.
   6.  **Timeline Analysis**:
-      -   For 'confidenceGraph', generate an array of EXACTLY 30 objects, each with a 'frame' and a 'confidence' value, simulating a scan over the video's duration.
+      -   For 'confidenceGraph', generate an array of about 20-30 objects, each with a 'frame' and a 'confidence' value, simulating a scan over the video's duration.
       -   For 'suspiciousSegments', identify 1 to 3 mock segments with start/end times and a brief reason.
   7.  **Multi-Modal Analysis**: Populate all fields for AV sync, biometrics, and provide a summary for frequency analysis.
   8.  **Explainability**: Provide a placeholder URL for the 'decisionTree' and a text summary for 'uncertaintyQuantification'.
