@@ -199,7 +199,7 @@ const analyzeDeepfakePrompt = ai.definePrompt({
   name: 'analyzeDeepfakeTextPrompt',
   input: {schema: AnalyzeDeepfakeInputSchema},
   output: {schema: TextAnalysisSchema},
-  prompt: `You are an expert in deepfake detection. Your task is to analyze the provided video and determine if it is a deepfake. Please provide a comprehensive textual analysis by populating all the fields in the requested JSON output schema as accurately as possible. You will generate visual heatmaps in a later step, so do not include any URLs or image data here.
+  prompt: `You are an expert in deepfake detection. Your task is to analyze the provided video and determine if it is a deepfake. Provide a comprehensive textual analysis by populating all the fields in the requested JSON output schema as accurately as possible. You will generate visual heatmaps in a later step, so do not include any URLs or image data here.
 
   Video: {{media url=videoDataUri}}
 
@@ -207,7 +207,7 @@ const analyzeDeepfakePrompt = ai.definePrompt({
   1.  **Overall Verdict & Confidence**: Based on the *entirety* of your analysis, make a final determination for 'isDeepfake'. The 'confidenceScore' should be a carefully weighed metric from 0.0 to 1.0, reflecting your certainty. A score of 0.9 or higher indicates very high certainty of a deepfake, while a score below 0.2 suggests it is likely authentic. The score should not be a simple average of evidence factors, but a holistic judgment based on the severity and number of detected artifacts. For instance, a single glaring temporal anomaly might justify a higher confidence score than several minor facial inconsistencies.
   2.  **Analysis Report**: Write a clear, multi-paragraph report of your findings.
   3.  **Evidence Breakdown**: Estimate the contribution of different factors ('facialInconsistency', 'temporalAnomalies', etc.). These are estimates and do not need to sum to a specific number.
-  4.  **Advanced Recognition**: Suggest a likely 'creationMethod' and assess the 'sophistication' level.
+  4.  **Advanced Recognition**: Based on the specific visual artifacts you observe (e.g., edge warping, unnatural smoothing, poor lip-sync), suggest a likely 'creationMethod'. Examples include FaceSwap, DeepFaceLab, SOTA, GAN variants, etc. Then, assess the 'sophistication' level from 'Low' to 'Very High' based on how convincing the manipulation is.
   5.  **Timeline Analysis**:
       -   'confidenceGraph': Generate a series of data points (around 20-30) to represent the confidence over the video's timeline.
       -   'suspiciousSegments': List a few (1-3) suspicious segments with approximate start/end times and a reason.
@@ -253,7 +253,7 @@ const analyzeDeepfakeFlow = ai.defineFlow(
       throw new Error('Failed to get a text-based analysis from the model.');
     }
 
-    // 2. In parallel, generate all the required visualizations.
+    // 2. In parallel, generate all the required visualizations based on the text analysis.
     const imageGenerationModel =
       'googleai/gemini-2.0-flash-preview-image-generation';
     const imageConfig = {responseModalities: ['TEXT', 'IMAGE'] as const};
@@ -268,27 +268,27 @@ const analyzeDeepfakeFlow = ai.defineFlow(
       ai.generate({
         model: imageGenerationModel,
         config: imageConfig,
-        prompt: `Generate a scientific attention heatmap for a deepfake video analysis. The visualization should show regions of high model focus (like eyes and mouth) on a generic human face, consistent with these findings: ${textAnalysis.analysisReport}`,
+        prompt: `Generate a scientific attention heatmap visualizing the key areas of focus during a deepfake video analysis. The visualization should be consistent with the following findings: ${textAnalysis.analysisReport}`,
       }),
       ai.generate({
         model: imageGenerationModel,
         config: imageConfig,
-        prompt: `Generate a technical anomaly heatmap. The visualization should highlight areas of digital artifacts, inconsistent lighting, and texture mismatches on a generic face, as if from a video analysis. Key anomalies found: Facial inconsistencies and temporal anomalies.`,
+        prompt: `Generate a technical anomaly heatmap. This visualization should highlight areas of digital artifacts and inconsistencies on a human face, based on a video analysis that reported a facial inconsistency score of ${textAnalysis.evidenceBreakdown.facialInconsistency * 100}%. Focus on highlighting artifacts consistent with these findings: ${textAnalysis.analysisReport}`,
       }),
       ai.generate({
         model: imageGenerationModel,
         config: imageConfig,
-        prompt: `Generate a temporal consistency heatmap for a video analysis. This should be a visualization that looks like a frame-by-frame analysis graph, showing fluctuations in deepfake detection confidence over time. The graph should reflect the suspicious segments found in the analysis.`,
+        prompt: `Generate a temporal consistency heatmap for a video analysis. This should be a graph-like visualization showing fluctuations in deepfake detection confidence over time, reflecting these specific suspicious segments: ${JSON.stringify(textAnalysis.timelineAnalysis.suspiciousSegments)}`,
       }),
       ai.generate({
         model: imageGenerationModel,
         config: imageConfig,
-        prompt: `Generate a feature importance heatmap. The visualization should show which facial features (e.g., eyes, mouth, nose bridge) were most influential in the deepfake detection, based on a machine learning model's analysis. The style should be scientific and clear.`,
+        prompt: `Generate a feature importance heatmap. The visualization should show which facial features were most influential in the deepfake detection. The analysis identified these contribution scores: Facial Inconsistency: ${textAnalysis.evidenceBreakdown.facialInconsistency}, Temporal Anomalies: ${textAnalysis.evidenceBreakdown.temporalAnomalies}, Audio Mismatch: ${textAnalysis.evidenceBreakdown.audioMismatch}. The style should be scientific and clearly represent this breakdown.`,
       }),
       ai.generate({
         model: imageGenerationModel,
         config: imageConfig,
-        prompt: `Generate a clear diagram visualizing a simplified decision tree for an AI model. It should illustrate the logical path for a deepfake detection analysis, with nodes representing checks like 'A/V Sync?', 'Blink Rate Normal?', 'Facial Artifacts?'. The final leaves should be 'Likely Deepfake' or 'Likely Authentic'.`,
+        prompt: `Generate a clear diagram visualizing a simplified decision tree for an AI model that performed a deepfake analysis. The final verdict was '${textAnalysis.isDeepfake ? "Deepfake Detected" : "Likely Authentic"}' with a confidence of ${Math.round(textAnalysis.confidenceScore * 100)}%. The tree should illustrate a plausible logical path to this conclusion, with nodes representing checks like 'A/V Sync Score: ${textAnalysis.multiModalAnalysis.avSyncScore}', 'Blink Rate Check', and 'Facial Artifacts?'.`,
       }),
     ]);
 
@@ -297,7 +297,7 @@ const analyzeDeepfakeFlow = ai.defineFlow(
       ...textAnalysis,
       heatmaps: {
         attention: attentionMedia.media.url,
-        anomaly: anomalyMedia.media.url,
+        anomaly: anomalyMedia.media.ul,
         temporal: temporalMedia.media.url,
         featureImportance: featureImportanceMedia.media.url,
       },
