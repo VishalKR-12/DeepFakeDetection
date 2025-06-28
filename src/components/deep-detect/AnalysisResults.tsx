@@ -184,7 +184,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           <TabsTrigger value="raw">Raw Data</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="summary" className="print:block" forceMount>
+        <TabsContent value="summary" className="data-[state=inactive]:hidden print:block" forceMount>
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="md:col-span-3">
               <CardHeader>
@@ -239,7 +239,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           </div>
         </TabsContent>
 
-        <TabsContent value="visuals" className="print:block" forceMount>
+        <TabsContent value="visuals" className="data-[state=inactive]:hidden print:block" forceMount>
           <Card>
             <CardHeader>
                 <CardTitle>Advanced Heatmap Analysis</CardTitle>
@@ -266,7 +266,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           </Card>
         </TabsContent>
 
-        <TabsContent value="timeline" className="print:block" forceMount>
+        <TabsContent value="timeline" className="data-[state=inactive]:hidden print:block" forceMount>
             <div className="grid gap-6">
                 <Card>
                     <CardHeader>
@@ -316,7 +316,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
             </div>
         </TabsContent>
 
-        <TabsContent value="xai" className="print:block" forceMount>
+        <TabsContent value="xai" className="data-[state=inactive]:hidden print:block" forceMount>
            <Card>
                <CardHeader><CardTitle>Explainable AI (XAI)</CardTitle><CardDescription>Understanding the AI's decision-making process.</CardDescription></CardHeader>
                <CardContent className="grid gap-6 md:grid-cols-2">
@@ -332,7 +332,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
            </Card>
         </TabsContent>
         
-        <TabsContent value="forensics" className="print:block" forceMount>
+        <TabsContent value="forensics" className="data-[state=inactive]:hidden print:block" forceMount>
             <Card>
                 <CardHeader><CardTitle>Forensic Report & Export</CardTitle></CardHeader>
                 <CardContent className="space-y-6">
@@ -355,7 +355,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
             </Card>
         </TabsContent>
 
-        <TabsContent value="raw" className="print:block" forceMount>
+        <TabsContent value="raw" className="data-[state=inactive]:hidden print:block" forceMount>
           <Card>
             <CardHeader><CardTitle>Raw JSON Data</CardTitle></CardHeader>
             <CardContent>
