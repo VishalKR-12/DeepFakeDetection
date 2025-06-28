@@ -74,25 +74,21 @@ const AnalyzeDeepfakeOutputSchema = z.object({
     .object({
       attention: z
         .string()
-        .url()
         .describe(
           "URL to an attention heatmap image. Use a placeholder: 'https://placehold.co/600x400.png'"
         ),
       anomaly: z
         .string()
-        .url()
         .describe(
           "URL to an anomaly heatmap image. Use a placeholder: 'https://placehold.co/600x400.png'"
         ),
       temporal: z
         .string()
-        .url()
         .describe(
           "URL to a temporal heatmap image. Use a placeholder: 'https://placehold.co/600x400.png'"
         ),
       featureImportance: z
         .string()
-        .url()
         .describe(
           "URL to a feature importance heatmap. Use a placeholder: 'https://placehold.co/600x400.png'"
         ),
@@ -160,7 +156,6 @@ const AnalyzeDeepfakeOutputSchema = z.object({
     .object({
       decisionTree: z
         .string()
-        .url()
         .describe(
           "URL to a decision tree visualization. Use a placeholder: 'https://placehold.co/600x800.png'"
         ),
