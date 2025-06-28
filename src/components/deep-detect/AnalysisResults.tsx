@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Image from "next/image";
 import {
-  ShieldAlert, ShieldCheck, FileText, FlaskConical, TrendingUp, Bot, BrainCircuit,
+  ShieldAlert, ShieldCheck, FileText, Bot, BrainCircuit,
   AreaChart, Map, GitBranch, FileDown, Clock, AudioWaveform, Eye, Move,
   Copy
 } from "lucide-react";
@@ -92,6 +92,39 @@ const ConfidenceTimelineChart = ({ data }: { data: any[] }) => (
   </ResponsiveContainer>
 );
 
+const jsonToXml = (json: object, rootElementName = "analysisReport") => {
+    let xml = '';
+
+    const toXml = (value: any, name: string): string => {
+        let xmlString = '';
+        // Sanitize tag name
+        const sanitizedName = name.replace(/[^a-zA-Z0-9_.-]/g, '_').replace(/^([0-9])/, '_$1');
+
+        if (Array.isArray(value)) {
+            value.forEach(item => {
+                const singularName = sanitizedName.endsWith('s') ? sanitizedName.slice(0, -1) : 'item';
+                xmlString += toXml(item, singularName);
+            });
+        } else if (typeof value === 'object' && value !== null) {
+            xmlString += `<${sanitizedName}>`;
+            Object.keys(value).forEach(key => {
+                xmlString += toXml(value[key], key);
+            });
+            xmlString += `</${sanitizedName}>`;
+        } else {
+            const escapedValue = value !== null && value !== undefined 
+                ? value.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
+                : '';
+            xmlString += `<${sanitizedName}>${escapedValue}</${sanitizedName}>`;
+        }
+        return xmlString;
+    };
+
+    xml += `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += toXml(json, rootElementName);
+    
+    return xml;
+};
 
 export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResultsProps) {
   const { toast } = useToast();
@@ -120,19 +153,22 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
       link.href = jsonString;
       link.download = "deepfake_analysis_report.json";
       link.click();
-    } else {
-       toast({
-        title: "Export not available",
-        description: `${format} export is not implemented in this prototype.`,
-        variant: "destructive"
-      });
+    } else if (format === 'PDF') {
+        window.print();
+    } else if (format === 'XML') {
+        const xmlResult = jsonToXml(result);
+        const xmlString = `data:application/xml;charset=utf-8,${encodeURIComponent(xmlResult)}`;
+        const link = document.createElement("a");
+        link.href = xmlString;
+        link.download = "deepfake_analysis_report.xml";
+        link.click();
     }
   }
 
 
   return (
     <div className="w-full max-w-7xl flex flex-col items-center gap-8 animate-in fade-in duration-500">
-      <div className="text-center">
+      <div className="text-center print:hidden">
         <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline">Analysis Complete</h2>
         <p className="mt-2 text-lg text-foreground/60">
           Review the comprehensive results from our multi-modal deepfake analysis.
@@ -140,7 +176,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
       </div>
 
       <Tabs defaultValue="summary" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 mb-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 mb-4 print:hidden">
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="visuals">Visual Evidence</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
@@ -149,7 +185,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           <TabsTrigger value="raw">Raw Data</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="summary">
+        <TabsContent value="summary" className="print:block">
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="md:col-span-3">
               <CardHeader>
@@ -204,7 +240,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           </div>
         </TabsContent>
 
-        <TabsContent value="visuals">
+        <TabsContent value="visuals" className="print:block">
           <Card>
             <CardHeader>
                 <CardTitle>Advanced Heatmap Analysis</CardTitle>
@@ -231,7 +267,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
           </Card>
         </TabsContent>
 
-        <TabsContent value="timeline">
+        <TabsContent value="timeline" className="print:block">
             <div className="grid gap-6">
                 <Card>
                     <CardHeader>
@@ -281,7 +317,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
             </div>
         </TabsContent>
 
-        <TabsContent value="xai">
+        <TabsContent value="xai" className="print:block">
            <Card>
                <CardHeader><CardTitle>Explainable AI (XAI)</CardTitle><CardDescription>Understanding the AI's decision-making process.</CardDescription></CardHeader>
                <CardContent className="grid gap-6 md:grid-cols-2">
@@ -297,7 +333,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
            </Card>
         </TabsContent>
         
-        <TabsContent value="forensics">
+        <TabsContent value="forensics" className="print:block">
             <Card>
                 <CardHeader><CardTitle>Forensic Report & Export</CardTitle></CardHeader>
                 <CardContent className="space-y-6">
@@ -305,10 +341,10 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
                         <h3 className="font-semibold">Chain of Custody</h3>
                         <div className="flex items-center gap-2 mt-2 p-3 bg-muted rounded-md font-mono text-sm">
                             <span className="truncate">{result.forensics.chainOfCustody}</span>
-                            <Button variant="ghost" size="icon" className="w-8 h-8" onClick={() => handleCopy(result.forensics.chainOfCustody)}><Copy className="w-4 h-4" /></Button>
+                            <Button variant="ghost" size="icon" className="w-8 h-8 print:hidden" onClick={() => handleCopy(result.forensics.chainOfCustody)}><Copy className="w-4 h-4" /></Button>
                         </div>
                     </div>
-                    <div>
+                    <div className="print:hidden">
                         <h3 className="font-semibold">Export Report</h3>
                         <div className="flex gap-4 mt-2">
                             <Button variant="outline" onClick={() => handleExport('JSON')}>Export as JSON</Button>
@@ -320,7 +356,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
             </Card>
         </TabsContent>
 
-        <TabsContent value="raw">
+        <TabsContent value="raw" className="print:block">
           <Card>
             <CardHeader><CardTitle>Raw JSON Data</CardTitle></CardHeader>
             <CardContent>
@@ -333,7 +369,7 @@ export function AnalysisResults({ result, videoPreview, onReset }: AnalysisResul
 
       </Tabs>
 
-      <div className="w-full mt-6 flex flex-col items-center gap-4">
+      <div className="w-full mt-6 flex flex-col items-center gap-4 print:hidden">
         <video src={videoPreview} controls className="w-full max-w-2xl rounded-lg aspect-video bg-black shadow-lg"></video>
         <Button onClick={onReset} size="lg" variant="outline" className="mt-4">
           Analyze Another Video
