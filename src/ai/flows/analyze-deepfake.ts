@@ -54,7 +54,7 @@ const AnalyzeDeepfakeOutputSchema = z.object({
         .describe('Contribution score from other factors (e.g. 0.1 for 10%).'),
     })
     .describe(
-      'A breakdown of factors contributing to the confidence score. The sum of scores should be 1.0.'
+      'A breakdown of factors contributing to the confidence score.'
     ),
   advancedPatternRecognition: z
     .object({
@@ -176,7 +176,7 @@ const AnalyzeDeepfakeOutputSchema = z.object({
       chainOfCustody: z
         .string()
         .describe(
-          "A mock blockchain-based verification trail hash. e.g., '0x' followed by 64 hex characters."
+          "A mock forensic verification hash."
         ),
     })
     .describe('Forensic and export related information.'),
@@ -193,24 +193,24 @@ const analyzeDeepfakePrompt = ai.definePrompt({
   name: 'analyzeDeepfakePrompt',
   input: {schema: AnalyzeDeepfakeInputSchema},
   output: {schema: AnalyzeDeepfakeOutputSchema},
-  prompt: `You are an expert in deepfake detection. Analyze the provided video and determine if it is a deepfake. Your analysis must be comprehensive and populate all fields in the provided JSON schema.
+  prompt: `You are an expert in deepfake detection. Your task is to analyze the provided video and determine if it is a deepfake. Please provide a comprehensive analysis by populating all the fields in the requested JSON output schema as accurately as possible.
 
   Video: {{media url=videoDataUri}}
 
-  Instructions:
-  1.  **Overall Verdict**: Set 'isDeepfake' to true or false and provide a 'confidenceScore' between 0.0 and 1.0.
-  2.  **Analysis Report**: Write a detailed, multi-paragraph report summarizing your findings.
-  3.  **Evidence Breakdown**: Assign values to 'facialInconsistency', 'temporalAnomalies', 'audioMismatch', and 'otherFactors'. These values MUST sum to 1.0.
-  4.  **Advanced Recognition**: Identify the likely 'creationMethod' and assess the 'sophistication' level.
-  5.  **Heatmaps**: Provide placeholder image URLs from 'https://placehold.co/' for all four heatmap types. DO NOT add text to the URL.
+  Guidelines for your analysis:
+  1.  **Overall Verdict**: Conclude if the video is a deepfake ('isDeepfake') and provide a corresponding 'confidenceScore' (0.0 to 1.0).
+  2.  **Analysis Report**: Write a clear, multi-paragraph report of your findings.
+  3.  **Evidence Breakdown**: Estimate the contribution of different factors ('facialInconsistency', 'temporalAnomalies', etc.). These are estimates and do not need to sum to a specific number.
+  4.  **Advanced Recognition**: Suggest a likely 'creationMethod' and assess the 'sophistication' level.
+  5.  **Heatmaps**: For all heatmap fields, provide placeholder image URLs from 'https://placehold.co/'. Use simple dimensions like '600x400' and do not add any other text to the URL.
   6.  **Timeline Analysis**:
-      -   For 'confidenceGraph', generate an array of about 20-30 objects, each with a 'frame' and a 'confidence' value, simulating a scan over the video's duration.
-      -   For 'suspiciousSegments', identify 1 to 3 mock segments with start/end times and a brief reason.
-  7.  **Multi-Modal Analysis**: Populate all fields for AV sync, biometrics, and provide a summary for frequency analysis.
-  8.  **Explainability**: Provide a placeholder URL for the 'decisionTree' and a text summary for 'uncertaintyQuantification'.
-  9.  **Forensics**: Generate a mock 'chainOfCustody' hash.
+      -   'confidenceGraph': Generate a series of data points (around 20 is a good number) to represent the confidence over the video's timeline.
+      -   'suspiciousSegments': List a few (1-3) suspicious segments with approximate start/end times and a reason.
+  7.  **Multi-Modal Analysis**: Fill in the sub-fields related to AV sync and biometrics based on your analysis.
+  8.  **Explainability**: Provide a placeholder URL for the 'decisionTree' and a summary for 'uncertaintyQuantification'.
+  9.  **Forensics**: Generate a plausible mock 'chainOfCustody' forensic hash.
 
-  Return the ENTIRE output as a single, valid JSON object that strictly follows the provided schema.
+  Please ensure your final output is a single, valid JSON object that strictly conforms to the provided schema structure.
   `,
   config: {
     safetySettings: [
