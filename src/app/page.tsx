@@ -18,11 +18,11 @@ export default function Home() {
   const { toast } = useToast();
 
   const handleAnalyze = async (file: File) => {
-    if (file.size > 4 * 1024 * 1024) { // 4MB limit for Genkit media
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
        toast({
         variant: "destructive",
         title: "File Too Large",
-        description: "Please upload a video smaller than 4MB.",
+        description: "Please upload a video smaller than 10MB.",
       });
       return;
     }

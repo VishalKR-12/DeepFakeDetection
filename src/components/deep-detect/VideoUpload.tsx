@@ -88,7 +88,7 @@ export function VideoUpload({ onAnalyze, isLoading }: VideoUploadProps) {
             <UploadCloud className="w-12 h-12 mb-2 text-primary" />
             <span className="font-semibold">Drag & drop a video file here</span>
             <span className="text-sm">or click to browse</span>
-            <span className="text-xs mt-2 text-muted-foreground">Supports MP4, MOV, AVI, etc. (Max 4MB)</span>
+            <span className="text-xs mt-2 text-muted-foreground">Supports MP4, MOV, AVI, etc. (Max 10MB)</span>
           </div>
         </div>
 
