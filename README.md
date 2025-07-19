@@ -2,8 +2,6 @@
 
 DeepDetect is an advanced, AI/ML-based solution designed to analyze and detect face-swap deepfake videos with high accuracy. It provides a user-friendly interface for uploading videos and receiving a comprehensive forensic analysis, helping to combat the spread of digital misinformation.
 
-![DeepDetect Screenshot](https://placehold.co/800x400.png?text=DeepDetect+UI)
-
 ## ✨ Key Features
 
 - **Advanced Deepfake Analysis:** Upload a video file and our AI will perform a frame-by-frame analysis to identify signs of digital manipulation.
